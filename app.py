@@ -20,6 +20,7 @@ load_dotenv()
 os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["GOOGLE_API_KEY"] = os.getenv("GOOGLE_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"] = "true"
+tavily_api_key = os.getenv('TAVILY_API_KEY')
 
 
 # Initialize LLM
@@ -32,7 +33,7 @@ class State(TypedDict):
 graph_builder = StateGraph(State)
 
 # Set up tool and LLM with tool binding
-tool = TavilySearch(max_results=2)
+tool = TavilySearch(api_key=tavily_api_key,max_results=2)
 tools = [tool]
 llm_with_tools = llm.bind_tools(tools)
 
