@@ -7,3 +7,4 @@ langchain_core
 dotenv
 streamlit
 langchain_community
+langchain-google-genai
