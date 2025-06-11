@@ -1,0 +1,9 @@
+typing
+langgraph
+langchain
+langchain_tavily
+langchain_core
+dotenv
+streamlit
+langchain_community
+langchain.agents 
