@@ -1,7 +1,7 @@
 
 from typing import Annotated
 from langchain_tavily import TavilySearch
-from langchain_core.tools import tool
+
 from langchain_core.messages import BaseMessage
 from typing_extensions import TypedDict
 
@@ -9,7 +9,7 @@ from langgraph.graph import START, StateGraph, END
 from langgraph.graph import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.types import Command, interrupt
+#from langgraph.types import Command, interrupt
 
 import os
 from dotenv import load_dotenv
@@ -40,21 +40,14 @@ class State(TypedDict):
 graph_builder = StateGraph(State)
 
 # Set up tool and LLM with tool binding
-@tool
-def human_assistance(query: str) -> str:
-    """Request assistance from a human."""
-    human_response = interrupt({"query": query})
-    return human_response["data"]
 
 tool = TavilySearch(api_key=tavily_api_key,max_results=2)
-tools = [tool,human_assistance]
+tools = [tool]
 llm_with_tools = llm.bind_tools(tools)
 
 # Define chatbot node
 def chatbot(state: State):
-    message = llm_with_tools.invoke(state["messages"])
-    assert(len(message.tool_calls) <= 1)
-    return {"messages": [message]}
+    return {"messages": [llm_with_tools.invoke(state["messages"])]}
 
 graph_builder.add_node("chatbot", chatbot)
 
