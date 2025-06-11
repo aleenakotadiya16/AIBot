@@ -14,6 +14,7 @@ from langgraph.checkpoint.memory import MemorySaver
 import os
 from dotenv import load_dotenv
 import streamlit as st
+import uuid
 
 #from langchain_community.llms.ollama import Ollama
 from langchain.chat_models import init_chat_model
@@ -67,17 +68,23 @@ st.title("LangGraph AI Assistant")
 if "state" not in st.session_state:
     st.session_state.state = {"messages": []}
 
+# Create a persistent thread ID for this session
+if "thread_id" not in st.session_state:
+    st.session_state.thread_id = str(uuid.uuid4())
+
+# Input field
 user_input = st.text_input("Ask me anything:")
 
 if user_input:
-    # Add user message
+    # Add user input to message list
     st.session_state.state["messages"].append({"role": "user", "content": user_input})
 
-    # Invoke the LangGraph flow
-    st.session_state.state = graph.invoke(st.session_state.state)
+    # Invoke LangGraph with config for thread_id
+    st.session_state.state = graph.invoke(
+        st.session_state.state,
+        config={"configurable": {"thread_id": st.session_state.thread_id}}
+    )
 
-    # Get the latest AI message only
+    # Extract latest AI response
     ai_response = st.session_state.state["messages"][-1].content
-
     st.markdown(f"**Answer:** {ai_response}")
-
