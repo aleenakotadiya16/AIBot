@@ -7,6 +7,7 @@ from typing_extensions import TypedDict
 from langgraph.graph import START, StateGraph, END
 from langgraph.graph import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
+from langgraph.checkpoint.memory import MemorySaver
 
 import os
 from dotenv import load_dotenv
@@ -25,6 +26,9 @@ tavily_api_key = os.getenv('TAVILY_API_KEY')
 
 # Initialize LLM
 llm = init_chat_model("google_genai:gemini-2.0-flash")
+
+#memory block
+memory = MemorySaver()
 
 # Define LangGraph state
 class State(TypedDict):
@@ -51,7 +55,7 @@ graph_builder.add_edge("tools", "chatbot")
 graph_builder.add_edge(START, "chatbot")
 
 # Compile graph
-graph = graph_builder.compile()
+graph = graph_builder.compile(checkpointer=memory)
 
 # Streamlit UI
 st.title("LangGraph AI Assistant")
